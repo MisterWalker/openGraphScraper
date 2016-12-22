@@ -52,6 +52,16 @@ var fieldsArray = [
 	},
 	{
 		multiple: false,
+		property: 'og:price:amount',
+		fieldName: 'ogPriceAmount'
+	},
+	{
+		multiple: false,
+		property: 'lowPrice',
+		fieldName: 'ogPriceAmount'
+	},
+	{
+		multiple: false,
 		property: 'og:url',
 		fieldName: 'ogUrl'
 	},
@@ -460,10 +470,10 @@ exports.getOG = function (options, callback) {
 			}
 
 			keys.forEach(function (key) {
-				if (!(meta[key].attribs && (meta[key].attribs.property || meta[key].attribs.name))) {
+				if (!(meta[key].attribs && (meta[key].attribs.property || meta[key].attribs.name || meta[key].attribs.itemprop))) {
 					return;
 				}
-				var property = meta[key].attribs.property || meta[key].attribs.name,
+				var property = meta[key].attribs.property || meta[key].attribs.name || meta[key].attribs.itemprop,
 					content = meta[key].attribs.content;
 				fieldsArray.forEach(function (item) {
 					if (property === item.property) {
@@ -587,6 +597,11 @@ exports.getOG = function (options, callback) {
 				// Get meta description tag if og description was not provided
 				if (!ogObject.ogDescription && $('head > meta[name="description"]').attr('content') && $('head > meta[name="description"]').attr('content').length > 0) {
 					ogObject.ogDescription = $('head > meta[name="description"]').attr('content');
+				}
+				// Get meta price tag if og price amount was not provided
+				if (!ogObject.ogPriceAmount && $('span[itemprop="price"]').text() && $('span[itemprop="price"]').text().length > 0) {
+					stringPrice = $('span[itemprop="price"]').text().replace("$", "");
+					ogObject.ogPriceAmount = stringPrice.trim();
 				}
 				// Get first image as og:image if there is no og:image tag.
 				if (!ogObject.ogImage && ogImageFallback) {
